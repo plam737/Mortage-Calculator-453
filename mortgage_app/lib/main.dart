@@ -13,8 +13,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'MortgageV0',
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
+        ),
       ),
       home: const MainScreen(),
     );

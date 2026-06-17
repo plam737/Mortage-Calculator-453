@@ -68,7 +68,12 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   // Helper to build a single label/value row, matching the mockup layout.
-  Widget _buildRow(String label, String value, {bool divider = true}) {
+  Widget _buildRow(
+    String label,
+    String value, {
+    bool divider = true,
+    Color dividerColor = const Color(0xFFBDBDBD),
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -82,7 +87,8 @@ class _MainScreenState extends State<MainScreen> {
             ],
           ),
         ),
-        if (divider) const Divider(height: 1),
+        if (divider)
+          Divider(height: 1, thickness: 2, color: dividerColor),
       ],
     );
   }
@@ -96,14 +102,18 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow('Amount', _mortgage.getFormattedAmount()),
-            _buildRow('Years', _mortgage.getYears().toString()),
+            _buildRow('Amount', _mortgage.getFormattedAmount(), divider: false),
+            _buildRow('Years', _mortgage.getYears().toString(), divider: false),
             _buildRow(
               'Interest Rate',
               '${(_mortgage.getRate() * 100).toStringAsFixed(2)}%',
+              dividerColor: Colors.red,
             ),
-            const SizedBox(height: 8),
-            _buildRow('Monthly Payment', _mortgage.formattedMonthlyPayment()),
+            _buildRow(
+              'Monthly Payment',
+              _mortgage.formattedMonthlyPayment(),
+              divider: false,
+            ),
             _buildRow(
               'Total Payment',
               _mortgage.formattedTotalPayment(),

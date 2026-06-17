@@ -15,10 +15,9 @@ class _ModifyScreenState extends State<ModifyScreen> {
   late TextEditingController _amountController;
   late double _selectedRate;
 
-  // Generates the list of rates from 2% to 15% in 0.25% increments,
-  // i.e. [0.0200, 0.0225, 0.0250, ..., 0.1500] as decimals.
+
   late final List<double> _rateOptions = List.generate(
-    53, // (15 - 2) / 0.25 + 1
+    53, 
     (index) => (2.0 + index * 0.25) / 100,
   );
 
@@ -104,9 +103,6 @@ class _ModifyScreenState extends State<ModifyScreen> {
             const SizedBox(height: 16),
             const Text('Interest Rate', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 4),
-            // The ListView the assignment asks for: rates from 2% to 15%
-            // in 0.25% steps. Fixed height so it scrolls within the screen
-            // instead of taking unbounded space.
             SizedBox(
               height: 220,
               child: ListView.builder(
