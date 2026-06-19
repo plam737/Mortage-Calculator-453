@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import '../mortgage.dart';
+import 'package:provider/provider.dart';
+import '../mortgage_provider.dart';
 
 class ModifyScreen extends StatefulWidget {
-  final Mortgage mortgage;
-
-  const ModifyScreen({super.key, required this.mortgage});
+  const ModifyScreen({super.key});
 
   @override
   State<ModifyScreen> createState() => _ModifyScreenState();
@@ -17,18 +16,19 @@ class _ModifyScreenState extends State<ModifyScreen> {
 
 
   late final List<double> _rateOptions = List.generate(
-    53, 
+    53,
     (index) => (2.0 + index * 0.25) / 100,
   );
 
   @override
   void initState() {
     super.initState();
-    _selectedYears = widget.mortgage.getYears();
+    final mortgage = context.read<MortgageProvider>().mortgage;
+    _selectedYears = mortgage.getYears();
     _amountController = TextEditingController(
-      text: widget.mortgage.getAmount().toStringAsFixed(2),
+      text: mortgage.getAmount().toStringAsFixed(2),
     );
-    _selectedRate = widget.mortgage.getRate();
+    _selectedRate = mortgage.getRate();
   }
 
   @override
@@ -38,30 +38,36 @@ class _ModifyScreenState extends State<ModifyScreen> {
   }
 
   void _onDonePressed() {
-    final mortgage = Mortgage();
-    mortgage.setYears(_selectedYears);
-    mortgage.setAmount(double.tryParse(_amountController.text) ?? widget.mortgage.getAmount());
-    mortgage.setRate(_selectedRate);
-    Navigator.pop(context, mortgage);
+    final provider = context.read<MortgageProvider>();
+    final parsedAmount =
+        double.tryParse(_amountController.text) ?? provider.mortgage.getAmount();
+
+    provider.updateMortgage(
+      years: _selectedYears,
+      amount: parsedAmount,
+      rate: _selectedRate,
+    );
+
+    Navigator.pop(context);
   }
 
   Widget _buildYearsRadios() {
     const yearOptions = [10, 15, 30];
-    return Row(
-      children: yearOptions.map((y) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Radio<int>(
-              value: y,
-              groupValue: _selectedYears,
-              onChanged: (value) => setState(() => _selectedYears = value!),
-            ),
-            Text(y.toString()),
-            const SizedBox(width: 8),
-          ],
-        );
-      }).toList(),
+    return RadioGroup<int>(
+      groupValue: _selectedYears,
+      onChanged: (value) => setState(() => _selectedYears = value!),
+      child: Row(
+        children: yearOptions.map((y) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Radio<int>(value: y),
+              Text(y.toString()),
+              const SizedBox(width: 8),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 

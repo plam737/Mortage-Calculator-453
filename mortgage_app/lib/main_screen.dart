@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../mortgage.dart';
+import 'package:provider/provider.dart';
+import '../mortgage_provider.dart';
 import 'modify_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -10,26 +11,15 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  Mortgage _mortgage = Mortgage();
   bool _termsAccepted = false;
 
-  // Opens the modify screen and waits for the result.
-  Future<void> _openModifyScreen() async {
-    final result = await Navigator.push(
+  void _openModifyScreen() {
+    Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => ModifyScreen(mortgage: _mortgage),
-      ),
+      MaterialPageRoute(builder: (context) => const ModifyScreen()),
     );
-
-    if (result != null && result is Mortgage) {
-      setState(() {
-        _mortgage = result;
-      });
-    }
   }
 
-  // Shows the confirmation AlertDialog when the checkbox is tapped.
   void _onTermsCheckboxChanged(bool? value) {
     if (value == true) {
       showDialog(
@@ -45,7 +35,6 @@ class _MainScreenState extends State<MainScreen> {
             actions: [
               TextButton(
                 onPressed: () {
-                  // User declines: keep the box unchecked.
                   setState(() => _termsAccepted = false);
                   Navigator.pop(context);
                 },
@@ -67,7 +56,6 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  // Helper to build a single label/value row, matching the mockup layout.
   Widget _buildRow(
     String label,
     String value, {
@@ -95,6 +83,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mortgage = context.watch<MortgageProvider>().mortgage;
+
     return Scaffold(
       appBar: AppBar(title: const Text('MortgageV0')),
       body: Padding(
@@ -102,21 +92,21 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow('Amount', _mortgage.getFormattedAmount(), divider: false),
-            _buildRow('Years', _mortgage.getYears().toString(), divider: false),
+            _buildRow('Amount', mortgage.getFormattedAmount(), divider: false),
+            _buildRow('Years', mortgage.getYears().toString(), divider: false),
             _buildRow(
               'Interest Rate',
-              '${(_mortgage.getRate() * 100).toStringAsFixed(2)}%',
+              '${(mortgage.getRate() * 100).toStringAsFixed(2)}%',
               dividerColor: Colors.red,
             ),
             _buildRow(
               'Monthly Payment',
-              _mortgage.formattedMonthlyPayment(),
+              mortgage.formattedMonthlyPayment(),
               divider: false,
             ),
             _buildRow(
               'Total Payment',
-              _mortgage.formattedTotalPayment(),
+              mortgage.formattedTotalPayment(),
               divider: false,
             ),
             CheckboxListTile(
